@@ -5,7 +5,7 @@
 FROM golang:1.17.2-alpine AS build-env
 
 # Install minimum necessary dependencies, remove packages
-RUN apk add --no-cache curl make git libc-dev bash gcc linux-headers eudev-dev
+RUN apk add --no-cache curl make git libc-dev bash gcc linux-headers eudev-dev g++  snappy snappy-dev lz4 lz4-dev perl  curl cmake ca-certificates build-base
 
 # Set working directory for the build
 WORKDIR /go/src/github.com/fibonacci-chain/fbc

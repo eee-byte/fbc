@@ -1,7 +1,6 @@
 #!/bin/bash
 
-KEY="captain"
-CHAINID="fbc-67"
+CHAINID="fbc-12306"
 MONIKER="fbc"
 CURDIR=`dirname $0`
 HOME_SERVER=$CURDIR/"_cache_evm"
@@ -21,7 +20,7 @@ killbyname() {
 
 
 run() {
-    LOG_LEVEL=main:info,iavl:info,*:error,state:info,provider:info
+    LOG_LEVEL=main:info,iavl:info,*:error,state:info,provider:info,x/mint:debug
 #--mempool.enable_delete_min_gp_tx false \
 #    fbchaind start --pruning=nothing --rpc.unsafe \
     fbchaind start --rpc.unsafe \
@@ -29,7 +28,7 @@ run() {
       --log_level $LOG_LEVEL \
       --log_file json \
       --dynamic-gp-mode=2 \
-      --consensus.timeout_commit 2000ms \
+      --consensus.timeout_commit 1000ms \
       --enable-preruntx=1 \
       --iavl-enable-async-commit \
       --enable-gid \
@@ -66,7 +65,7 @@ set -x # activate debugging
 rm -rf ~/.fbc*
 rm -rf $HOME_SERVER
 
-(cd .. && make install Venus1Height=1 Venus2Height=1 EarthHeight=1)
+#(cd .. && make install Venus1Height=1 Venus2Height=1 EarthHeight=1)
 
 # Set up config for CLI
 fbchaincli config chain-id $CHAINID
@@ -79,23 +78,23 @@ fbchaincli config keyring-backend test
 #
 #    "eth_address": "0xbbE4733d85bc2b90682147779DA49caB38C0aA1F",
 #     prikey: 8ff3ca2d9985c3a52b459e2f6e7822b23e1af845961e22128d5f372fb9aa5f17
-fbchaincli keys add --recover captain -m "puzzle glide follow cruel say burst deliver wild tragic galaxy lumber offer" -y
+fbchaincli keys add --recover admin1 -m "puzzle glide follow cruel say burst deliver wild tragic galaxy lumber offer" -y
 
 #    "eth_address": "0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0",
-fbchaincli keys add --recover admin16 -m "palace cube bitter light woman side pave cereal donor bronze twice work" -y
+fbchaincli keys add --recover admin2 -m "palace cube bitter light woman side pave cereal donor bronze twice work" -y
 
-fbchaincli keys add --recover admin17 -m "antique onion adult slot sad dizzy sure among cement demise submit scare" -y
+fbchaincli keys add --recover admin3 -m "antique onion adult slot sad dizzy sure among cement demise submit scare" -y
 
-fbchaincli keys add --recover admin18 -m "lazy cause kite fence gravity regret visa fuel tone clerk motor rent" -y
+fbchaincli keys add --recover admin4 -m "lazy cause kite fence gravity regret visa fuel tone clerk motor rent" -y
 
 # Set moniker and chain-id for Ethermint (Moniker can be anything, chain-id must be an integer)
 fbchaind init $MONIKER --chain-id $CHAINID --home $HOME_SERVER
 
-# Change parameter token denominations to okt
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
-cat $HOME_SERVER/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="okt"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+# Change parameter token denominations to fibo
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["staking"]["params"]["bond_denom"]="fibo"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["crisis"]["constant_fee"]["denom"]="fibo"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="fibo"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
+cat $HOME_SERVER/config/genesis.json | jq '.app_state["mint"]["params"]["mint_denom"]="fibo"' > $HOME_SERVER/config/tmp_genesis.json && mv $HOME_SERVER/config/tmp_genesis.json $HOME_SERVER/config/genesis.json
 
 # Enable EVM
 
@@ -110,13 +109,13 @@ else
 fi
 
 # Allocate genesis accounts (cosmos formatted addresses)
-fbchaind add-genesis-account $(fbchaincli keys show $KEY    -a) 100000000okt --home $HOME_SERVER
-fbchaind add-genesis-account $(fbchaincli keys show admin16 -a) 900000000okt --home $HOME_SERVER
-fbchaind add-genesis-account $(fbchaincli keys show admin17 -a) 900000000okt --home $HOME_SERVER
-fbchaind add-genesis-account $(fbchaincli keys show admin18 -a) 900000000okt --home $HOME_SERVER
+fbchaind add-genesis-account $(fbchaincli keys show admin1 -a) 100000000fibo --home $HOME_SERVER
+fbchaind add-genesis-account $(fbchaincli keys show admin2 -a) 900000000fibo --home $HOME_SERVER
+fbchaind add-genesis-account $(fbchaincli keys show admin3 -a) 900000000fibo --home $HOME_SERVER
+fbchaind add-genesis-account $(fbchaincli keys show admin4 -a) 900000000fibo --home $HOME_SERVER
 
 # Sign genesis transaction
-fbchaind gentx --name $KEY --keyring-backend test --home $HOME_SERVER
+fbchaind gentx --name admin1 --keyring-backend test --home $HOME_SERVER
 
 # Collect genesis tx
 fbchaind collect-gentxs --home $HOME_SERVER

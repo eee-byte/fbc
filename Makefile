@@ -32,8 +32,8 @@ Venus5Height=0 #new proposal
 EarthHeight=0 #support wasm
 MarsHeight=0 #support ibc
 JupiterHeight=100 #chainId change
-
-
+#CometHeight=1 #Modify block rewards and repair historical production
+WITH_ROCKSDB=true
 LINK_STATICALLY = false
 cgo_flags=
 
@@ -57,8 +57,7 @@ ifeq ($(MAKECMDGOALS),mainnet)
 	Venus5Height=11076419
 	EarthHeight=0 #support wasm
 	MarsHeight=0 #support ibc
-	JupiterHeight=11076419 #chainId change 2023-03-18 00:00:00 11076419
-
+	JupiterHeight=10766 #chainId change 2023-03-18 00:00:00 11076419
 
     WITH_ROCKSDB=true
 else ifeq ($(MAKECMDGOALS),testnet)
@@ -208,7 +207,7 @@ ifeq ($(OS),Windows_NT)
 	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/fbchaind.exe ./cmd/fbchaind
 	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/fbchaincli.exe ./cmd/fbchaincli
 else
-	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/fbchaind ./cmd/fbchaind
+	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/fbchaind ./cmd/fbchaind 
 	go build $(BUILD_FLAGS) -tags "$(build_tags)" -o build/fbchaincli ./cmd/fbchaincli
 endif
 

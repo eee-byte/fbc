@@ -57,7 +57,8 @@ const (
 )
 
 const (
-	MainNetJupiter1Height = 10762449
+	//MainNetJupiter1Height = 10762449
+	MainNetJupiter1Height = 10762
 	TestNetJupiterHeight  = 10761449
 
 	MainNetVeneus1Height = 12988000

@@ -70,6 +70,35 @@ func (k Keeper) UpdateMinterCustomToRightJupiter(ctx sdk.Context, minter *types.
 	k.SetMinterCustom(ctx, *minter)
 }
 
+// UpdateMinterCustomToRightComet occur 2023.11.21
+func (k Keeper) UpdateMinterCustomToRightComet(ctx sdk.Context, minter *types.MinterCustom, params types.Params) {
+	//update param to right
+	params.DeflationEpoch = types.FiboChainDeflationEpoch
+	params.DeflationRate = types.FiboChainDeflationRate
+	params.BlocksPerYear = uint64(8298947)
+
+	firstYearPerBlock := sdk.MustNewDecFromStr("1.584122660380889") //first year mint per block
+
+	minter.MintedPerBlock = sdk.NewDecCoinsFromDec(params.MintDenom, firstYearPerBlock)
+
+	var provisionAmtPerBlock sdk.Dec
+	if ctx.BlockHeight() == 0 || minter.NextBlockToUpdate == 0 {
+		provisionAmtPerBlock = k.GetOriginalMintedPerBlock()
+	} else {
+		provisionAmtPerBlock = minter.MintedPerBlock.AmountOf(params.MintDenom).Mul(params.DeflationRate)
+	}
+
+	// update new MinterCustom
+	minter.MintedPerBlock = sdk.NewDecCoinsFromDec(params.MintDenom, provisionAmtPerBlock)
+	/*
+	* 按照每个块3.8s来计算，每年出块数为8298947，故在此之后都按照每年出块8298947个块
+	 */
+	minter.NextBlockToUpdate = uint64(ctx.BlockHeight() + 1591579) //uint64(70*24*3600/3.8)  追平之后的70天后也就是2024年2月1左右减产
+
+	k.SetParams(ctx, params)
+	k.SetMinterCustom(ctx, *minter)
+}
+
 // UpdateMinterCustom every year deflation rate 20%, assume year blockNumber 10519200
 // total mint:  7777_7777 - 1200_0000 = 65777777
 // 2022 1year: 65777777 * 0.2 = 13155555.4 / 10519200 = 1.2506231842725684

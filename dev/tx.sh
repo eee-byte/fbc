@@ -2,6 +2,6 @@
 
     for (( i=0; ; ))
     do
-        fibohaincli tx send captain 0x83D83497431C2D3FEab296a9fba4e5FaDD2f7eD0 1fibo --fees 1fibo -b block -y
+        $(pwd)/fbchaincli tx send node1 0xB526728759eD94Df2b1DDA90Ad9137Ee2236048d 1fibo --fees 1fibo -b block -y --home ./chain-data/node1/fbchaincli/ --node tcp://localhost:26657
     done
 
